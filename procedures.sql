@@ -43,7 +43,7 @@ $$ LANGUAGE plpgsql;
 
 /*
 Procedure para Resetar Senha de Usuário
-Descrição: Gera um novo token de redefinição de senha para um usuário, invalidando qualquer token antigo e retornando o novo token.
+Descrição: Gera um novo token de redefinição de senha para um usuário, retornando o novo token.
 */
 CREATE OR REPLACE PROCEDURE reset_user_password(
     login_email VARCHAR(255),
@@ -64,10 +64,6 @@ BEGIN
 
     -- Gerar um novo token (usando função random para simplificar)
     reset_token := md5(random()::text || clock_timestamp()::text);
-
-    -- Excluir tokens antigos
-    DELETE FROM "ResetPassword"
-    WHERE "login_id" = login_id;
 
     -- Inserir novo token
     INSERT INTO "ResetPassword" ("id", "login_id", "reset_password_token", "createdAt")
