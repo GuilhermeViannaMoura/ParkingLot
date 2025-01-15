@@ -1,41 +1,44 @@
 /*
  
- Trigger para Atualizar Disponibilidade do Estacionamento
- 
- Sempre que uma nova Reserva for criada ou excluída, o número de vagas usadas no estacionamento (used_spots) deve 
- ser atualizado na tabela ParkingSpot.
+ Trigger para validar formato do CPF ao cadastrar um novo usuário.
  
 */
 
--- Trigger para criação de reservas
-CREATE OR REPLACE FUNCTION update_used_spots_on_insert()
+CREATE OR REPLACE FUNCTION valida_cpf()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE "ParkingSpot"
-    SET "used_spots" = "used_spots" + 1
-    WHERE "id" = NEW."parking_spot_id";
+    IF NOT NEW."cpf" ~ '^[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}$' THEN
+        RAISE EXCEPTION 'CPF inválido';
+    END IF;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_update_used_spots_on_insert
-AFTER INSERT ON "Reservation"
+CREATE TRIGGER valida_cpf
+BEFORE INSERT OR UPDATE ON "User"
 FOR EACH ROW
-EXECUTE FUNCTION update_used_spots_on_insert();
+EXECUTE FUNCTION valida_cpf();
 
--- Trigger para exclusão de reservas
-CREATE OR REPLACE FUNCTION update_used_spots_on_delete()
+
+/*
+ 
+ Trigger para validar formato do CNPJ ao cadastrar um novo fornecedor.
+ 
+*/
+
+CREATE OR REPLACE FUNCTION valida_cnpj()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE "ParkingSpot"
-    SET "used_spots" = "used_spots" - 1
-    WHERE "id" = OLD."parking_spot_id";
-    RETURN OLD;
+    IF NOT NEW."cnpj" ~ '^[0-9]{2}\.[0-9]{3}\.[0-9]{3}/[0-9]{4}-[0-9]{2}$' THEN
+        RAISE EXCEPTION 'CNPJ inválido';
+    END IF;
+
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_update_used_spots_on_delete
-AFTER DELETE ON "Reservation"
+CREATE TRIGGER valida_cnpj
+BEFORE INSERT OR UPDATE ON "Company"
 FOR EACH ROW
-EXECUTE FUNCTION update_used_spots_on_delete();
-
+EXECUTE FUNCTION valida_cnpj();
