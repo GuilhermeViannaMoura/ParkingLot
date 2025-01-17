@@ -1,6 +1,8 @@
 # Reserva de Vagas de Estacionamento
 
 Como tema do nosso trabalho, escolhemos um sistema de reserva de vagas antecipadas de estacionamento para qualquer tipo de veículo.
+## Grupo
+Guilherme Moura, Thiago Arruda e Pedro Trink
 
 ## Modelo
 
